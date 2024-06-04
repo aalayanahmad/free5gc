@@ -45,7 +45,7 @@ $(GO_BIN_PATH)/%: $(NF_GO_FILES)
 # $(@F): The file-within-directory part of the file name of the target.
 	@echo "Start building $(@F)...."
 	cd $(GO_SRC_PATH)/$(@F)/cmd && \
-	CGO_ENABLED=0 go build -gcflags "$(GCFLAGS)" -ldflags "$(LDFLAGS)" -o $(ROOT_PATH)/$@ main.go
+	CGO_ENABLED=1 go build -gcflags "$(GCFLAGS)" -ldflags "$(LDFLAGS)" -o $(ROOT_PATH)/$@ main.go
 
 vpath %.go $(addprefix $(GO_SRC_PATH)/, $(GO_NF))
 
@@ -69,7 +69,7 @@ $(WEBCONSOLE)/$(GO_BIN_PATH)/$(WEBCONSOLE): $(WEBCONSOLE)/server.go $(WEBCONSOLE
 	rm -rf ../public && \
 	cp -R build ../public
 	cd $(WEBCONSOLE) && \
-	CGO_ENABLED=0 go build -ldflags "$(WEBCONSOLE_LDFLAGS)" -o $(ROOT_PATH)/$@ ./server.go
+	CGO_ENABLED=1 go build -ldflags "$(WEBCONSOLE_LDFLAGS)" -o $(ROOT_PATH)/$@ ./server.go
 
 clean:
 	rm -rf $(addprefix $(GO_BIN_PATH)/, $(GO_NF))
