@@ -28,6 +28,15 @@ WEBCONSOLE_LDFLAGS = -X github.com/free5gc/util/version.VERSION=$(VERSION) \
                      -X github.com/free5gc/util/version.COMMIT_HASH=$(WEBCONSOLE_COMMIT_HASH) \
                      -X github.com/free5gc/util/version.COMMIT_TIME=$(WEBCONSOLE_COMMIT_TIME)
 
+# Define the package manager
+PKG_MANAGER := apt-get
+
+# Define the package name for libpcap
+LIBPCAP_PKG := libpcap-dev
+
+# Define the list of dependencies required for building UPF
+UPF_BUILD_DEPS := $(LIBPCAP_PKG)
+
 .PHONY: $(NF) $(WEBCONSOLE) clean
 
 .DEFAULT_GOAL: nfs
@@ -39,10 +48,17 @@ all: $(NF) $(WEBCONSOLE)
 debug: GCFLAGS += -N -l
 debug: all
 
+$(NF_GO_FILES): | $(GO_BIN_PATH)
+
+$(GO_BIN_PATH):
+	mkdir -p $@
+
 $(GO_NF): % : $(GO_BIN_PATH)/%
 
 $(GO_BIN_PATH)/%: $(NF_GO_FILES)
 # $(@F): The file-within-directory part of the file name of the target.
+	@echo "Installing build dependencies for $@..."
+	sudo $(PKG_MANAGER) install -y $(UPF_BUILD_DEPS)
 	@echo "Start building $(@F)...."
 	cd $(GO_SRC_PATH)/$(@F)/cmd && \
 	CGO_ENABLED=1 go build -gcflags "$(GCFLAGS)" -ldflags "$(LDFLAGS)" -o $(ROOT_PATH)/$@ main.go
@@ -75,4 +91,3 @@ clean:
 	rm -rf $(addprefix $(GO_BIN_PATH)/, $(GO_NF))
 	rm -rf $(addprefix $(GO_SRC_PATH)/, $(addsuffix /$(C_BUILD_PATH), $(C_NF)))
 	rm -rf $(WEBCONSOLE)/$(GO_BIN_PATH)/$(WEBCONSOLE)
-
