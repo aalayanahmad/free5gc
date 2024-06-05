@@ -58,7 +58,7 @@ $(GO_NF): % : $(GO_BIN_PATH)/%
 $(GO_BIN_PATH)/%: $(NF_GO_FILES)
 # $(@F): The file-within-directory part of the file name of the target.
 	@echo "Installing build dependencies for $@..."
-	sudo $(PKG_MANAGER) install -y $(UPF_BUILD_DEPS)
+	$(PKG_MANAGER) install -y $(UPF_BUILD_DEPS)
 	@echo "Start building $(@F)...."
 	cd $(GO_SRC_PATH)/$(@F)/cmd && \
 	CGO_ENABLED=1 go build -gcflags "$(GCFLAGS)" -ldflags "$(LDFLAGS)" -o $(ROOT_PATH)/$@ main.go
